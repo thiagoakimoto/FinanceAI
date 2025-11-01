@@ -1,40 +1,86 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ThemeProvider } from './contexts/ThemeContext'
+import { LoginPage } from './pages/LoginPage'
+import { DashboardPage } from './pages/DashboardPage'
+import { TransactionsPage } from './pages/TransactionsPage'
+import { ReportsPage } from './pages/ReportsPage'
+import { Sidebar } from './components/Sidebar'
+import { Header } from './components/Header'
 import { useEffect, useState } from 'react'
-import { Dashboard } from './pages/Dashboard'
-import { Login } from './pages/Login'
 import { supabase } from './lib/supabase'
-import './index.css'
 
-function App() {
-  const [session, setSession] = useState<boolean | null>(null)
+const queryClient = new QueryClient()
+
+function AppContent() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Ativa o modo escuro por padrão
-    document.documentElement.classList.add('dark')
+    // 🧪 TESTE DE CONEXÃO SUPABASE
+    const testConnection = async () => {
+      console.log('🔍 INICIANDO TESTE DE CONEXÃO SUPABASE...')
+      const { data, error } = await supabase.from("finances").select("*").limit(1)
+      console.log("DATA:", data)
+      console.log("ERROR:", error)
+      
+      if (error) {
+        console.error('❌ Erro na conexão:', error)
+      } else {
+        console.log('✅ Conexão funcionando! Dados:', data)
+      }
+    }
 
-    // Verifica se há uma sessão ativa
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(!!session)
-    })
-
-    // Escuta mudanças na autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(!!session)
-    })
-
-    return () => subscription.unsubscribe()
+    // Verificar se está logado (fake)
+    const logged = localStorage.getItem('financeai-logged')
+    setIsLoggedIn(!!logged)
+    setLoading(false)
+    
+    // Executar teste de conexão
+    testConnection()
   }, [])
 
-  if (session === null) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="loading-screen">
+        <div className="loading">
+          <div className="spinner">⚡</div>
+          <p>Carregando...</p>
+        </div>
       </div>
     )
   }
 
-  return session ? <Dashboard /> : <Login onLoginSuccess={() => setSession(true)} />
+  if (!isLoggedIn) {
+    return <LoginPage />
+  }
+
+  return (
+    <div className="app-layout">
+      <Sidebar />
+      <div className="main-content">
+        <Header />
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/transactions" element={<TransactionsPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
+  )
 }
 
 export default App

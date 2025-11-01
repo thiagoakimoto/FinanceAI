@@ -3,37 +3,41 @@ export interface Transaction {
   date: string
   category: string
   amount: number
-  type: 'gasto' | 'saldo'
-  created_at?: string
+  created_at: string
+  month: string  // Campo adicional que existe na sua tabela
 }
 
 export interface MonthlyBalance {
   id: number
-  month: number
-  year: number
+  month: string  // TEXT na sua tabela
+  year: number   // INTEGER na sua tabela  
   initial_balance: number
-  created_at?: string
+  created_at: string
 }
 
-export interface DashboardStats {
-  currentBalance: number
-  monthlySpending: number
-  spendingPercentage: number
-  dailyAverage: number
-  balanceChange: number
-  largestExpense: {
-    amount: number
-    category: string
-  }
-}
-
-export interface CategorySpending {
+export interface CategoryTotal {
   category: string
   total: number
   percentage: number
+  color: string
 }
 
-export interface DailySpending {
-  date: string
-  amount: number
+export interface MonthlyStats {
+  currentBalance: number
+  totalSpent: number
+  percentageSpent: number
+  lastTransaction: Transaction | null
+  categoryTotals: CategoryTotal[]
+  dailyExpenses: { date: string; amount: number }[]
+  projectedBalance: number
 }
+
+export const CATEGORIES = {
+  'Alimentação': '#6366f1',
+  'Transporte': '#8b5cf6',
+  'Lazer': '#ec4899',
+  'Contas Fixas': '#06b6d4',
+  'Outros': '#10b981',
+} as const
+
+export type CategoryName = keyof typeof CATEGORIES
