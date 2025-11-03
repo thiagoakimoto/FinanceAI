@@ -1,10 +1,66 @@
-import { TrendingUp } from 'lucide-react'
+import { useState } from 'react'
+import { TrendingUp, User, Lock, AlertCircle } from 'lucide-react'
+import { supabase } from '../lib/supabase'
 
 export function LoginPage() {
-  const handleLogin = () => {
-    // Login fake - apenas redireciona
-    localStorage.setItem('financeai-logged', 'true')
-    window.location.reload()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!username.trim() || !password.trim()) {
+      setError('Por favor, preencha todos os campos')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      console.log('🔐 Tentando fazer login com:', username)
+      
+      // Buscar usuário no banco
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('name', username.trim())
+        .eq('password', password)
+        .limit(1)
+
+      if (error) {
+        console.error('❌ Erro na consulta:', error)
+        setError('Erro ao conectar com o banco de dados')
+        return
+      }
+
+      if (!users || users.length === 0) {
+        console.log('❌ Credenciais inválidas')
+        setError('Usuário ou senha incorretos')
+        return
+      }
+
+      const user = users[0]
+      console.log('✅ Login realizado com sucesso:', user.name)
+      
+      // Salvar dados do usuário logado
+      localStorage.setItem('financeai-logged', 'true')
+      localStorage.setItem('financeai-user', JSON.stringify({
+        id: user.id,
+        name: user.name
+      }))
+      
+      // Recarregar página para aplicar login
+      window.location.reload()
+      
+    } catch (error) {
+      console.error('💥 Erro no login:', error)
+      setError('Erro inesperado ao fazer login')
+    } finally {
+      setLoading(false)
+    }
   }
   
   return (
@@ -16,25 +72,55 @@ export function LoginPage() {
         
         <h1 className="login-title">FinanceAI</h1>
         <p className="login-subtitle">
-          Seu controle financeiro inteligente
+          Faça login para acessar seu dashboard
         </p>
         
-        <button className="btn-login" onClick={handleLogin}>
-          Acessar Dashboard
-        </button>
+        {error && (
+          <div className="login-error">
+            <AlertCircle size={16} />
+            <span>{error}</span>
+          </div>
+        )}
         
-        <div style={{ 
-          marginTop: '2rem', 
-          fontSize: '0.9rem', 
-          color: '#a0a0b8',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.5rem'
-        }}>
-          <p>💼 Dashboard completo</p>
-          <p>📊 Relatórios em tempo real</p>
-          <p>📈 Análise de gastos</p>
-        </div>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="input-group">
+            <div className="input-icon">
+              <User size={20} />
+            </div>
+            <input
+              type="text"
+              placeholder="Usuário"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="login-input"
+              disabled={loading}
+            />
+          </div>
+          
+          <div className="input-group">
+            <div className="input-icon">
+              <Lock size={20} />
+            </div>
+            <input
+              type="password"
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="login-input"
+              disabled={loading}
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            className="btn-login" 
+            disabled={loading}
+          >
+            {loading ? 'Entrando...' : 'Fazer Login'}
+          </button>
+        </form>
+        
+        
       </div>
     </div>
   )

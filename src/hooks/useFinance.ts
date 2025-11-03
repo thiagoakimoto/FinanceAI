@@ -2,6 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { Transaction, MonthlyBalance } from '../types'
 
+// Mapeamento dos meses em português (lowercase) para armazenar/comparar com a coluna text
+const MONTH_NAMES = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+]
+
 // Hook para buscar transações
 export function useTransactions(month?: number, year?: number) {
   const currentMonth = month || new Date().getMonth() + 1
@@ -13,34 +19,39 @@ export function useTransactions(month?: number, year?: number) {
       try {
         console.log('🔍 Buscando transações para:', { currentMonth, currentYear })
         
-        // Vamos buscar TODAS as transações primeiro para ver a estrutura
+        // A coluna `month` na base é TEXT (ex: 'novembro'). Convertemos o número do mês
+        // para o nome em português e buscamos diretamente por esse nome.
+        const monthName = MONTH_NAMES[currentMonth - 1] || String(currentMonth)
+
+        console.log('🔍 Buscando por month:', monthName)
+
         const { data, error } = await supabase
           .from('finances')
           .select('*')
+          .ilike('month', monthName)
           .order('date', { ascending: false })
-          .limit(50)
         
         if (error) {
           console.error('❌ Erro ao buscar transações:', error)
-          console.log('🔄 Usando dados de exemplo...')
-          return mockTransactions
+          console.log('🔄 Retornando lista vazia devido ao erro...')
+          return [] as Transaction[]
         }
         
         console.log('✅ Transações encontradas:', data?.length || 0)
         console.log('📊 Estrutura da primeira transação:', data?.[0])
         
-        // Filtrar por mês/ano no frontend se necessário
+        // Filtrar por mês/ano no frontend se necessário (garantir que a data bate com o ano/mês)
         const filtered = data?.filter(t => {
           const transactionDate = new Date(t.date)
-          return transactionDate.getMonth() + 1 === currentMonth && 
+          return transactionDate.getMonth() + 1 === currentMonth &&
                  transactionDate.getFullYear() === currentYear
         }) || []
         
-        console.log('📈 Transações filtradas:', filtered.length)
-        return (filtered as Transaction[]) || mockTransactions
+  console.log('📈 Transações filtradas:', filtered.length)
+  return (filtered as Transaction[]) || []
       } catch (error) {
         console.error('💥 Erro no useTransactions:', error)
-        return mockTransactions
+        return [] as Transaction[]
       }
     },
     refetchInterval: 30000,
@@ -58,19 +69,21 @@ export function useMonthlyBalance(month?: number, year?: number) {
       try {
         console.log('🔍 Buscando saldo mensal para:', { currentMonth, currentYear })
         
-        // Como month é TEXT e year é INTEGER na sua tabela
-        const monthStr = String(currentMonth).padStart(2, '0')
-        
+        // Buscar saldo mensal (month é TEXT com nomes, year é INTEGER)
+        const monthName = MONTH_NAMES[currentMonth - 1] || String(currentMonth)
+
+        console.log('🔍 Buscando saldo para month:', monthName, 'year:', currentYear)
+
         const { data, error } = await supabase
           .from('monthly_balances')
           .select('*')
-          .eq('month', monthStr)
-          .eq('year', currentYear)  // year é INTEGER, não precisa converter
+          .ilike('month', monthName)
+          .eq('year', currentYear)
         
         if (error) {
           console.error('❌ Erro ao buscar saldo mensal:', error)
-          console.log('🔄 Usando saldo de exemplo...')
-          return mockMonthlyBalance
+          console.log('🔄 Retornando undefined devido ao erro...')
+          return undefined
         }
         
         console.log('✅ Saldos encontrados:', data?.length || 0)
@@ -81,66 +94,16 @@ export function useMonthlyBalance(month?: number, year?: number) {
           return data[0] as MonthlyBalance
         } else {
           console.log('⚠️ Saldo não encontrado para', { currentMonth, currentYear })
-          console.log('📝 Criando saldo de exemplo...')
-          return mockMonthlyBalance
+          console.log('📝 Retornando undefined (nenhum saldo encontrado)')
+          return undefined
         }
       } catch (error) {
         console.error('💥 Erro no useMonthlyBalance:', error)
-        return mockMonthlyBalance
+        return undefined
       }
     },
     refetchInterval: 30000,
   })
 }
 
-// Dados de exemplo para quando o Supabase não estiver configurado
-const mockTransactions: Transaction[] = [
-  {
-    id: 1,
-    date: '2025-11-01T10:00:00Z',
-    category: 'Alimentação',
-    amount: 150.00,
-    created_at: '2025-11-01T10:00:00Z',
-    month: '11'
-  },
-  {
-    id: 2,
-    date: '2025-11-02T14:30:00Z',
-    category: 'Transporte',
-    amount: 45.00,
-    created_at: '2025-11-02T14:30:00Z',
-    month: '11'
-  },
-  {
-    id: 3,
-    date: '2025-11-03T19:15:00Z',
-    category: 'Alimentação',
-    amount: 80.00,
-    created_at: '2025-11-03T19:15:00Z',
-    month: '11'
-  },
-  {
-    id: 4,
-    date: '2025-11-04T20:45:00Z',
-    category: 'Lazer',
-    amount: 200.00,
-    created_at: '2025-11-04T20:45:00Z',
-    month: '11'
-  },
-  {
-    id: 5,
-    date: '2025-11-05T09:00:00Z',
-    category: 'Contas Fixas',
-    amount: 300.00,
-    created_at: '2025-11-05T09:00:00Z',
-    month: '11'
-  }
-]
-
-const mockMonthlyBalance: MonthlyBalance = {
-  id: 1,
-  month: '11',
-  year: 2025,  // INTEGER, não string
-  initial_balance: 5000.00,
-  created_at: '2025-11-01T00:00:00Z'
-}
+// Nota: Removidos dados fictícios. Agora retornamos somente os dados vindos do Supabase.

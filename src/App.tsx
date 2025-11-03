@@ -8,7 +8,6 @@ import { ReportsPage } from './pages/ReportsPage'
 import { Sidebar } from './components/Sidebar'
 import { Header } from './components/Header'
 import { useEffect, useState } from 'react'
-import { supabase } from './lib/supabase'
 
 const queryClient = new QueryClient()
 
@@ -17,27 +16,10 @@ function AppContent() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // 🧪 TESTE DE CONEXÃO SUPABASE
-    const testConnection = async () => {
-      console.log('🔍 INICIANDO TESTE DE CONEXÃO SUPABASE...')
-      const { data, error } = await supabase.from("finances").select("*").limit(1)
-      console.log("DATA:", data)
-      console.log("ERROR:", error)
-      
-      if (error) {
-        console.error('❌ Erro na conexão:', error)
-      } else {
-        console.log('✅ Conexão funcionando! Dados:', data)
-      }
-    }
-
     // Verificar se está logado (fake)
     const logged = localStorage.getItem('financeai-logged')
     setIsLoggedIn(!!logged)
     setLoading(false)
-    
-    // Executar teste de conexão
-    testConnection()
   }, [])
 
   if (loading) {

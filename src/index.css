@@ -115,6 +115,83 @@ html, body {
   box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4) !important;
 }
 
+.btn-login:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+/* LOGIN FORM */
+.login-form {
+  width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.input-group {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.input-icon {
+  position: absolute !important;
+  left: 1.2rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: var(--text-secondary) !important;
+  z-index: 2 !important;
+}
+
+.login-input {
+  width: 100% !important;
+  padding: 1.2rem 1.2rem 1.2rem 3.5rem !important;
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  color: var(--text-primary) !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-input:focus {
+  outline: none !important;
+  border-color: var(--gradient-start) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+
+.login-input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+.login-input:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+.login-error {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 1rem !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  border-radius: 12px !important;
+  color: #ef4444 !important;
+  font-size: 0.9rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.login-features {
+  margin-top: 2rem !important;
+  font-size: 0.9rem !important;
+  color: var(--text-secondary) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
 /* APP LAYOUT */
 .app-layout {
   display: flex !important;
@@ -135,10 +212,12 @@ html, body {
   top: 0 !important;
   width: 280px !important;
   height: 100vh !important;
+  min-height: 100vh !important;
   background: var(--bg-secondary) !important;
   border-right: 1px solid var(--border-color) !important;
   padding: 2rem 1.5rem !important;
   z-index: 100 !important;
+  overflow-y: auto !important;
 }
 
 .sidebar-header {
@@ -212,6 +291,12 @@ html, body {
   display: flex !important;
   align-items: center !important;
   gap: 1rem !important;
+}
+
+.user-name {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
 }
 
 .user-avatar {
@@ -440,6 +525,17 @@ html, body {
 
 .transactions-table tr:hover {
   background: var(--bg-tertiary) !important;
+}
+
+/* TRANSACTION AMOUNTS */
+.amount.positive {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.amount.negative {
+  color: #ef4444;
+  font-weight: 600;
 }
 
 /* FORMS */
@@ -712,6 +808,118 @@ html, body {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)) !important;
   gap: 2rem !important;
   margin-bottom: 3rem !important;
+}
+
+/* CATEGORY CHART */
+.category-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.category-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  gap: 0.25rem;
+}
+
+.category-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.category-amount {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.category-bar-container {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.category-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.category-percentage {
+  min-width: 45px;
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* EXPENSE CHART */
+.expense-chart {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  height: 200px;
+  padding: 1rem 0;
+}
+
+.expense-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.day-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.day-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.expense-bar-container {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: end;
+  background: linear-gradient(transparent, var(--bg-tertiary) 98%);
+  border-radius: 4px;
+}
+
+.expense-bar {
+  width: 100%;
+  background: linear-gradient(to top, #6366f1, #8b5cf6);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.3s ease;
+}
+
+.expense-amount {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 /* RESPONSIVO */

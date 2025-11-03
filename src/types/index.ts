@@ -25,6 +25,8 @@ export interface CategoryTotal {
 export interface MonthlyStats {
   currentBalance: number
   totalSpent: number
+  totalIncomes: number  // ✅ Novo campo para entradas
+  totalExpenses: number // ✅ Novo campo para saídas
   percentageSpent: number
   lastTransaction: Transaction | null
   categoryTotals: CategoryTotal[]
@@ -37,7 +39,13 @@ export const CATEGORIES = {
   'Transporte': '#8b5cf6',
   'Lazer': '#ec4899',
   'Contas Fixas': '#06b6d4',
-  'Outros': '#10b981',
+  'Locomoção': '#f59e0b',
+  'Salário': '#10b981',
+  'Freelance': '#059669',
+  'Investimentos': '#3b82f6',
+  'Renda Extra': '#16a34a',
+  'Vendas': '#65a30d',
+  'Outros': '#64748b',
 } as const
 
 export type CategoryName = keyof typeof CATEGORIES

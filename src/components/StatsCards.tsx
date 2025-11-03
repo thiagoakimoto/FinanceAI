@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown, DollarSign, Calendar } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react'
 import { formatCurrency } from '../lib/utils'
 import type { MonthlyStats } from '../types'
 
@@ -9,63 +9,63 @@ interface StatsCardsProps {
 export function StatsCards({ stats }: StatsCardsProps) {
   return (
     <div className="stats-grid">
+      {/* Total de Entradas */}
+      <div className="stat-card">
+        <div className="stat-header">
+          <span className="stat-label">Total de Entradas</span>
+          <div className="stat-icon">
+            <TrendingUp size={20} color="white" />
+          </div>
+        </div>
+        <div className="stat-value">{formatCurrency(stats.totalIncomes || 0)}</div>
+        <div className="stat-trend positive">
+          <TrendingUp size={16} />
+          <span>Receitas</span>
+        </div>
+      </div>
+
+      {/* Total de Saídas */}
+      <div className="stat-card">
+        <div className="stat-header">
+          <span className="stat-label">Total de Saídas</span>
+          <div className="stat-icon">
+            <TrendingDown size={20} color="white" />
+          </div>
+        </div>
+        <div className="stat-value">{formatCurrency(stats.totalExpenses || 0)}</div>
+        <div className="stat-trend negative">
+          <TrendingDown size={16} />
+          <span>Gastos</span>
+        </div>
+      </div>
+
       {/* Saldo Atual */}
       <div className="stat-card">
         <div className="stat-header">
           <span className="stat-label">Saldo Atual</span>
           <div className="stat-icon">
-            <TrendingUp size={20} color="white" />
+            <DollarSign size={20} color="white" />
           </div>
         </div>
         <div className="stat-value">{formatCurrency(stats.currentBalance || 0)}</div>
-        <div className="stat-trend positive">
-          <TrendingUp size={16} />
-          <span>+12%</span>
+        <div className={`stat-trend ${stats.currentBalance >= 0 ? 'positive' : 'negative'}`}>
+          {stats.currentBalance >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+          <span>{stats.currentBalance >= 0 ? 'Positivo' : 'Negativo'}</span>
         </div>
       </div>
 
-      {/* Total Gasto */}
+      {/* Percentual Gasto */}
       <div className="stat-card">
         <div className="stat-header">
-          <span className="stat-label">Gasto no Mês</span>
+          <span className="stat-label">% do Orçamento</span>
           <div className="stat-icon">
             <DollarSign size={20} color="white" />
           </div>
         </div>
-        <div className="stat-value">{formatCurrency(stats.totalSpent || 0)}</div>
-        <div className="stat-trend negative">
-          <TrendingDown size={16} />
-          <span>-8%</span>
-        </div>
-      </div>
-
-      {/* Percentual do Saldo */}
-      <div className="stat-card">
-        <div className="stat-header">
-          <span className="stat-label">% do Saldo Gasto</span>
-          <div className="stat-icon">
-            <Calendar size={20} color="white" />
-          </div>
-        </div>
         <div className="stat-value">{(stats.percentageSpent || 0).toFixed(1)}%</div>
-        <div className="stat-trend positive">
-          <TrendingUp size={16} />
+        <div className={`stat-trend ${stats.percentageSpent <= 80 ? 'positive' : 'negative'}`}>
+          {stats.percentageSpent <= 80 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
           <span>Meta: 80%</span>
-        </div>
-      </div>
-
-      {/* Previsão Final */}
-      <div className="stat-card">
-        <div className="stat-header">
-          <span className="stat-label">Previsão Final</span>
-          <div className="stat-icon">
-            <TrendingUp size={20} color="white" />
-          </div>
-        </div>
-        <div className="stat-value">{formatCurrency(stats.projectedBalance || 0)}</div>
-        <div className="stat-trend positive">
-          <TrendingUp size={16} />
-          <span>+5%</span>
         </div>
       </div>
     </div>

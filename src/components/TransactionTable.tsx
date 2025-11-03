@@ -30,7 +30,9 @@ export function TransactionTable({ transactions }: TransactionTableProps) {
                   </span>
                 </td>
                 <td className="amount-cell">
-                  {formatCurrency(transaction.amount)}
+                  <span className={`amount ${transaction.amount >= 0 ? 'positive' : 'negative'}`}>
+                    {transaction.amount >= 0 ? '+' : ''}{formatCurrency(transaction.amount)}
+                  </span>
                 </td>
               </tr>
             ))
